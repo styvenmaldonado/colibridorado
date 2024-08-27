@@ -1,0 +1,29 @@
+{
+  "name": "nuxt-app",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "nuxt build",
+    "dev": "nuxt dev",
+    "generate": "nuxt generate",
+    "preview": "nuxt preview",
+    "postinstall": "nuxt prepare"
+  },
+  "dependencies": {
+    "@nuxtjs/tailwindcss": "^6.12.1",
+    "aws-amplify": "^6.5.3",
+    "nuxt": "^3.12.4",
+    "vue": "latest",
+    "vuetify-nuxt-module": "^0.17.1"
+  },
+  "devDependencies": {
+    "@aws-amplify/backend": "^1.1.1",
+    "@aws-amplify/backend-cli": "^1.2.5",
+    "aws-cdk": "^2.154.1",
+    "aws-cdk-lib": "^2.154.1",
+    "constructs": "^10.3.0",
+    "esbuild": "^0.23.1",
+    "tsx": "^4.19.0",
+    "typescript": "^5.5.4"
+  }
+}
