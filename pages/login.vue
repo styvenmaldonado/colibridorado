@@ -1,3 +1,27 @@
+<script lang="ts">
+  import { signIn } from 'aws-amplify/auth';
+  export default {
+  // Properties returned from data() become reactive state
+  // and will be exposed on `this`.
+  data() {
+    return {
+      email: "",
+      password: ""
+    }
+  },
+  methods: {
+    async onSubmit(){
+      const response = await signIn({
+        username: this.email,
+        password: this.password
+      })
+      console.log(response)
+    }
+  }
+}
+
+</script>
+
 <template>
 <div class="flex flex-col w-screen h-screen">
 <div class="h-44 lg:h-60 relative">
@@ -13,7 +37,7 @@
         <h1 class="text-2xl text-violet-950 font-black">Iniciar Sesion</h1>
         <span>Bienllegad@ a la Familia Colibrí Dorado, un espacio de sanación desde la frecuencia cuántica del amor.
         </span>
-        <v-form class="pt-4 flex flex-col">
+        <v-form @submit.prevent="onSubmit" class="pt-4 flex flex-col">
           <v-text-field
           :rules="[() => !!email || 'Campo requerido']"
             required
@@ -42,10 +66,8 @@
      </div>     
   </div>
   <div class="flex h-40">
-    <div class="m-auto">¿Aún no tienes cuenta? <NuxtLink class="text-fuchsia-900 font-bold" to="registrate">Registrate</NuxtLink> </div>
+    <div class="m-auto">¿Aún no tienes cuenta? <NuxtLink class="text-fuchsia-900 font-bold" to="/registrate">Registrate</NuxtLink> </div>
   </div>
 </div>
 </template>
-<script lang="ts">
-    
-</script>
+
