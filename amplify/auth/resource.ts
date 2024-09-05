@@ -6,10 +6,12 @@ import { defineAuth } from '@aws-amplify/backend';
  */
 export const auth = defineAuth({
   loginWith: {
-    email: true,
+    email: {
+      verificationEmailStyle: "CODE",
+      verificationEmailSubject: "Bienvenido a Colibri Dorado",
+      verificationEmailBody: (createCode) => `Use this code to confirm your account: ${createCode()}`
+    },
   },
-
-    
   userAttributes: {
     // specify a "birthdate" attribute
     givenName: {
@@ -35,14 +37,14 @@ export const auth = defineAuth({
     "custom:tipo_documento": {
       dataType: "String",
       mutable: true,
-      maxLen: 16,
+      maxLen: 80,
       minLen: 1,
     },
     "custom:numero_documento": {
-      dataType: "Number",
+      dataType: "String",
       mutable: true,
-      min: 1,
-      max: 100,
+      maxLen: 80,
+      minLen: 1,
     },
   },
   groups: ["SUPERADMIN", "ADMIN"],
