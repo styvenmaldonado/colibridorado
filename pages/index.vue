@@ -1,70 +1,14 @@
-<script lang="ts">
-import { Amplify } from "aws-amplify";
-import outputs from '../amplify_outputs.json';
-import { signUp } from "aws-amplify/auth"
-
-Amplify.configure(outputs);
-export default {
-  // Properties returned from data() become reactive state
-  // and will be exposed on `this`.
-
-  data() {
-    return {
-      t_doc: [
-        'CC - Cédula de Ciudadanía',
-        'CE - Cédula de extranjería',
-        'PA - Pasaporte',
-        'TI - Tarjeta de Identidad',
-        'CD - Carnet Diplomático',
-        'PEP - Permiso Especial de Permanencia'
-      ],
-      step: 1,
-      items: [
-        'Información personal',
-        'Email y Contraseña'
-      ],
-      givenName: "",
-      familyName: "",
-      tipo_documento: "",
-      numero_documento: "",
-      birthdate: "",
-      address: "",
-      email: "",
-      phone: "",
-      password: "",
-      confirmPassword: ""
-    }
-  },
-  methods: {
-    async onSubmit() {
-      try {
-        const { userId, isSignUpComplete, nextStep } = await signUp({
-          username: this.email,
-          password: this.password,
-          options: {
-            userAttributes: {
-              phone_number: "+" + this.phone, // E.164 number convention
-              given_name: this.givenName,
-              family_name: this.familyName,
-              birthdate: this.birthdate,
-              address: this.address,
-              "custom:tipo_documento": this.tipo_documento,
-              "custom:numero_documento": this.numero_documento
-            },
-          }
-        });
-        nextStep.signUpStep == "CONFIRM_SIGN_UP" && await navigateTo({ path: '/OTP', query: { email: this.email } });
-      } catch (error) {
-        console.log(error)
-      }
-    }
-  }
-}
-
+<script setup lang="ts">
+definePageMeta({ middleware: "auth", auth: { guestRedirectTo: "/login" } })
+import ButtonNavigation from '~/layouts/ButtonNavigation.vue';
+const { signIn, signOut, session, status, cookies, getProviders } = useAuth()
 
 </script>
 <template>
   <div class="flex flex-col w-screen h-screen">
+    <div class="fixed bottom-0 left-0">
+      <ButtonNavigation />
+    </div>
     <div class="h-44 lg:h-60 relative">
       <div class="absolute w-full h-full flex">
         <div class="flex w-28 h-28 lg:w-36 lg:h-36 rounded-full shadow-lg m-auto bg-white">
@@ -74,8 +18,7 @@ export default {
       <img class="h-full w-full object-fill" src="/background.webp" />
     </div>
     <div
-      class="bg-white pt-10 lg:pt-0 lg:m-auto lg:w-3/6 flex flex-col lg:rounded-lg lg:shadow-lg lg:border lg:border-gray-300"
-      >
+      class="bg-white pt-10 lg:pt-0 lg:m-auto lg:w-3/6 flex flex-col lg:rounded-lg lg:shadow-lg lg:border lg:border-gray-300">
       <div class="px-5 lg:w-11/12 lg:py-8 mx-auto " style="width: -webkit-fill-available;">
         <div class="text-lg">
           <span class="font-bold">Bienllegad@</span> <span class="font-bold text-violet-950">Cristian 🥳</span>
@@ -92,7 +35,7 @@ export default {
         </div>
       </div>
       <div class="text-lg pt-8 px-5">
-        <span class="font-bold text-violet-950">Ceremonia</span> 
+        <span class="font-bold text-violet-950">Ceremonia</span>
       </div>
       <div class="overflow-hidden">
         <div class="flex overflow-x-auto gap-4 pl-4">
@@ -133,7 +76,7 @@ export default {
         </div>
       </div>
       <div class="text-lg pt-8 px-5">
-        <span class="font-bold text-violet-950">Retiros</span> 
+        <span class="font-bold text-violet-950">Retiros</span>
       </div>
       <div class="overflow-hidden">
         <div class="flex overflow-x-auto gap-4 pl-4">
@@ -173,8 +116,21 @@ export default {
           </a>
         </div>
       </div>
-
-
+      <div class="pt-24"></div>
     </div>
+    <button-nav :items="[
+      {
+        title: 'Inicio', route: '', icon: 'mdi-home-outline', active: true
+      },
+      {
+        title: 'Mis Eventos', route: '/my-events', icon: 'mdi-calendar-blank-multiple'
+      },
+      {
+        title: 'Pagos', route: '/my-payments', icon: 'mdi-credit-card-outline'
+      },
+      {
+        title: 'Mi Perfil', route: '/my-profile', icon: 'mdi-account-circle'
+      }
+    ]" />
   </div>
 </template>

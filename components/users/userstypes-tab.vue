@@ -14,7 +14,7 @@ export default {
                 <h1 class="text-4xl font-bold">Tipos de Usuario</h1>
             </div>
             <div class="ml-auto">
-                <button @click="goTo('/users/create')"
+                <button @click="goTo('/users/createUserType')"
                     class="px-5 font-bold rounded-lg py-3 bg-gradient-to-r from-fuchsia-900 to-violet-950 text-white">+
                     Nuevo Tipo de Usuario</button>
             </div>

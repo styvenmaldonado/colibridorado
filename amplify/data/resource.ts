@@ -21,6 +21,7 @@ const schema = a.schema({
       city: a.string(),
       country: a.string(),
       userTypeId: a.string(),
+      rol: a.string(),
       usersTypes: a.belongsTo("UsersTypes","userTypeId"),
       eventsUsers: a.hasMany("EventsUser","userId"),
       interviews: a.hasMany("Interviews","userId"),
@@ -102,6 +103,7 @@ export const data = defineData({
     defaultAuthorizationMode: "iam",
   },
 });
+
 
 
 /*== STEP 2 ===============================================================

@@ -1,89 +1,47 @@
 <script lang="ts">
-  export default {
-    data: () => ({
-      itemsPerPage: 5,
-      serverItems: [
-        {
-          givenName: "MARIO ALBERTO",
-          familyName:"GONZALEZ GUITIERREZ",
-          tipo_documento: "CC",
-          numero_documento: "104345467",
-          phone: "314454354",
-          email:"email@miemail.com"
-        },
-        {
-          givenName: "CLARA XIMENA",
-          familyName:"PEREZ GUITIERREZ",
-          tipo_documento: "CC",
-          numero_documento: "1045098876",
-          phone: "314454354",
-          email:"email@miemail.com"
-        },
-        {
-          givenName: "CARLOS JULIAN",
-          familyName:"GONZALEZ GONZALEZ",
-          tipo_documento: "CC",
-          numero_documento: "104345467",
-          phone: "314454354",
-          email:"email@miemail.com"
-        },
-        {
-          givenName: "HELBERT ",
-          familyName:"RODRIGUEZ GUTIERREZ",
-          tipo_documento: "CC",
-          numero_documento: "104345467",
-          phone: "314454354",
-          email:"email@miemail.com"
-        },
-        {
-          givenName: "JOSE ROBERTO",
-          familyName:"ROJAS GUIERREZ",
-          tipo_documento: "CC",
-          numero_documento: "104345467",
-          phone: "314454354",
-          email:"email@miemail.com"
-        },
+import { client } from "../../libs/AmplifyDataClient";
 
-      ],
-      loading: false,
-      totalItems: 0,
-    }),
-    methods: {
-      async loadItems () {
-
-      },
-      async handleClick(_row: any){
-        await navigateTo({ path: "/users/detail/1235"})
-      }
+export default {
+  data: () => ({
+    itemsPerPage: 5,
+    serverItems: [],
+    loading: true,
+    totalItems: 0,
+  }),
+  methods: {
+    async loadItems() {
+      const { data } = await client.models.Users.list();
+      // @ts-ignore: serverItems never[]
+      this.serverItems.push(...data)
+      this.loading = false;
     },
-  }
+    async handleClick(e: PointerEvent, row: any) {
+      const { id } = this.serverItems[row?.index || 0]
+      await navigateTo(`/users/detail/${id}`)
+    }
+  },
+}
+
+
 </script>
 <template>
-    <v-data-table-server
-    v-model:items-per-page="itemsPerPage"
-    :headers="[
-      {
-        title: 'Nombres',
-        align: 'start',
-        sortable: false,
-        key: 'givenName',
-      },
-      {
-        title: 'Apellidos',
-        align: 'start',
-        sortable: false,
-        key: 'familyName',
-      },
-      { title: 'Tipo Documento', key: 'tipo_documento', align: 'end' },
-      { title: 'Numero Documento', key: 'numero_documento', align: 'end' },
-      { title: 'Telefono', key: 'phone', align: 'end' },
-      { title: 'Email', key: 'email', align: 'end' },
-    ]"
-    :items="serverItems"
-    :items-length="totalItems"
-    :loading="loading"
-    item-value="name"
-    @update:options="loadItems"
-    @click:row="handleClick"
-  ></v-data-table-server>
+  <v-data-table-server v-model:items-per-page="itemsPerPage" :headers="[
+    {
+      title: 'Nombres',
+      align: 'start',
+      sortable: false,
+      key: 'given_name',
+    },
+    {
+      title: 'Apellidos',
+      align: 'start',
+      sortable: false,
+      key: 'family_name',
+    },
+    { title: 'Tipo Documento', key: 'tipo_documento', align: 'end' },
+    { title: 'Numero Documento', key: 'numero_documento', align: 'end' },
+    { title: 'Telefono', key: 'phone', align: 'end' },
+    { title: 'Email', key: 'email', align: 'end' },
+  ]" loading-text="Cargando... Por favor espere!" :items="serverItems" :items-length="totalItems" :loading="loading"
+    item-value="name" @update:options="loadItems" @click:row="handleClick"></v-data-table-server>
 </template>

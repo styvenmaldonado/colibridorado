@@ -1,56 +1,21 @@
 <script lang="ts">
+import { client } from '~/libs/AmplifyDataClient';
+
 
 
   export default {
     data: () => ({
       itemsPerPage: 5,
-      headers: [
-        {
-          title: 'Id',
-          align: 'start',
-          sortable: false,
-          key: 'id',
-        },
-        {
-          title: 'Tipo Usuario',
-          align: 'start',
-          sortable: false,
-          key: 'usertype',
-        },
-      ],
-      serverItems: [
-    {
-      id: "1",
-      usertype: "Caminantes No Entrenad@s",
-    },
-    {
-      id: "2",
-      usertype: "Caminantes Entrenad@s",
-    },
-    {
-      id: "3",
-      usertype: "Caminantes Entrenamiento Especial",
-    },
-    {
-      id: "3",
-      usertype: "Caminantes Administrativo",
-    },
-    {
-      id: "3",
-      usertype: "Caminantes Logistica",
-    },
-    {
-      id: "3",
-      usertype: "Caminantes Acostad@s",
-    },
-   
-  ],
-      loading: false,
+      serverItems: [],
+      loading: true,
       totalItems: 0,
     }),
     methods: {
-      loadItems () {
-      
+      async loadItems () {
+        const { data } = await client.models.UsersTypes.list();
+        // @ts-ignore: serverItems never[]
+        this.serverItems.push(...data)
+        this.loading = false
       },
     },
   }
@@ -58,7 +23,20 @@
 <template>
     <v-data-table-server
     v-model:items-per-page="itemsPerPage"
-    :headers="headers"
+    :headers="[
+      {
+        title: 'Id',
+        align: 'start',
+        sortable: false,
+        key: 'id',
+      },
+      {
+        title: 'Tipo Usuario',
+        align: 'start',
+        sortable: false,
+        key: 'name',
+      },
+    ]"
     :items="serverItems"
     :items-length="totalItems"
     :loading="loading"

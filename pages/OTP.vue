@@ -1,47 +1,60 @@
-<script lang="ts">
-import { confirmSignUp } from 'aws-amplify/auth'
+<script setup lang="ts">
+definePageMeta({ middleware: "guest-only", auth: { authenticatedRedirectTo: "/" } })
+
+import { confirmSignUp, resendSignUpCode } from 'aws-amplify/auth'
 import { Amplify } from "aws-amplify";
 import outputs from '../amplify_outputs.json';
-
+import { toast } from "vue3-toastify";
+import "vue3-toastify/dist/index.css";
 
 Amplify.configure(outputs);
 
+const router = useRoute()
 
+const state = ref(
+  {
+    code: "",
+    loading: false,
+    error: false
+  }
+)
 
+const resendCode = async () => {
+  try {
+    await resendSignUpCode({
+    username: router.query?.email?.toString() || "",
+  })
+  } catch (error) {
+    toast("Error al enviar código OTP, Intente mas tarde", {
+      "theme": "colored",
+      "type": "error",
+      "position": "top-center",
+      "autoClose": false,
+      "dangerouslyHTMLString": true
+    })
+  }
+  
+}
 
-// console.log(route.query)
-
-export default {
-  // Properties returned from data() become reactive state
-  // and will be exposed on `this`.
-  data() {
-    return {
-      code: "",
-      loading: false,
-      error: false
-    }
-  },
-  methods: {
-    async onclick() {
-      const router = useRouter()
-      const { isSignUpComplete, nextStep } = await confirmSignUp({
-        username: router.currentRoute.value.query?.email?.toString() || "",
-        confirmationCode: this.code
-      })
-      nextStep.signUpStep == "DONE" && await navigateTo("/");
-
-    }
-  },
-  watch: {
-    async code(code) {
-      // if (code?.length == 6) {
-      //   this.loading = true;
-      //   const a = await confirmSignIn({
-      //     challengeResponse: this.code
-      //   })
-      //   console.log(a)
-      // }
-    }
+const onclick = async () => {
+  try {
+    state.value.loading = true;
+    const router = useRouter()
+    const { isSignUpComplete, nextStep } = await confirmSignUp({
+      username: router.currentRoute.value.query?.email?.toString() || "",
+      confirmationCode: state.value.code
+    })
+    nextStep.signUpStep == "DONE" && await navigateTo("/");
+  } catch (error) {
+    toast("Código OTP Invalido", {
+      "theme": "colored",
+      "type": "error",
+      "position": "top-center",
+      "autoClose": false,
+      "dangerouslyHTMLString": true
+    })
+    state.value.loading = false
+    state.value.code = ""
   }
 }
 
@@ -61,15 +74,20 @@ export default {
       class="bg-white pt-10 lg:pt-0 lg:m-auto lg:w-3/6  flex lg:rounded-lg lg:shadow-lg lg:border lg:border-gray-300">
       <div class="px-5 lg:w-11/12 lg:py-8 mx-auto">
         <h1 class="text-2xl text-violet-950 font-black">Verificación OTP</h1>
-        <span>Bienllegad@ a la Familia Colibrí Dorado, un espacio de sanación desde la frecuencia cuántica del amor.
-        </span>
+        <span>Revisa la bandeja de entrada o de spam de tu correo electrónico <span
+            class="text-blue-600 font-bold underline">{{ router.query?.email }}</span>. Te hemos enviado un correo con un código de seguridad,
+          ingrésalo para crear tu cuenta</span>
         <div class="py-6">
-          <v-otp-input :loading="loading" v-model="code" focus-all :length="6"></v-otp-input>
+          <v-otp-input :loading="state.loading" v-model="state.code" focus-all :length="6"></v-otp-input>
         </div>
-        <button @click="onclick" color="surface-variant" text="Submit" variant="tonal"
-          class="bg-gradient-to-r from-fuchsia-900 to-violet-950 text-white font-bold py-4 w-full rounded-lg">Enviar</button>
-
-
+        <div class="py-6 flex">
+          <div class="m-auto flex gap-1">
+            <span>¿No recibiste el código OTP?</span>
+            <button @click="resendCode" class="text-blue-600 font-bold ">REENVIAR CÓDIGO</button>
+          </div>
+        </div>
+        <button :disabled="state.code.length < 5" @click="onclick" color="surface-variant" text="Submit" variant="tonal"
+          :class="state.code.length < 5 ? 'bg-gray-200 font-bold py-4 w-full rounded-lg text-gray-400' : 'bg-gradient-to-r from-fuchsia-900 to-violet-950 text-white font-bold py-4 w-full rounded-lg'">Enviar</button>
       </div>
     </div>
   </div>

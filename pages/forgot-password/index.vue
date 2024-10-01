@@ -1,46 +1,60 @@
-<script lang="ts">
+<script setup lang="ts">
 import { Amplify } from "aws-amplify";
 import outputs from '../../amplify_outputs.json';
 import { confirmResetPassword, resetPassword } from 'aws-amplify/auth';
-import { confirmSignUp } from 'aws-amplify/auth'
+import type { SubmitEventPromise } from "vuetify";
+import { toast } from "vue3-toastify";
+import "vue3-toastify/dist/index.css";
 
 Amplify.configure(outputs);
-export default {
-    // Properties returned from data() become reactive state
-    // and will be exposed on `this`.
+const state = ref(
+    {
+        code: "",
+        email: "",
+        password: "",
+        confirmPassword: "",
+        step: 1
+    }
+)
 
-    data() {
-        return {
-            code: "",
-            email: "",
-            password: "",
-            confirmPassword: "",
-            step: 1
-        }
-    },
-    methods: {
-        async step1() {
-            const { nextStep } = await resetPassword({
-                username: this.email
-            })
-            if (nextStep.resetPasswordStep == "CONFIRM_RESET_PASSWORD_WITH_CODE") {
-                this.step = 2
-            }
-        },
-        async step2() {
-            this.step = 3
-        },
-        async step3() {
-            await confirmResetPassword({
-                username: this.email,
-                confirmationCode: this.code,
-                newPassword: this.password,
-            });
-            await navigateTo("/login")
-        }
+
+const step1 = async (event: SubmitEventPromise) => {
+    const { valid } = await event;
+    if (!valid) return
+    const { nextStep } = await resetPassword({
+        username: state.value.email
+    })
+    if (nextStep.resetPasswordStep == "CONFIRM_RESET_PASSWORD_WITH_CODE") {
+        state.value.step = 2
     }
 }
+const step2 = async (event: SubmitEventPromise) => {
+    const { valid } = await event;
+    if (!valid) return
+    state.value.step = 3
+}
 
+const step3 = async (event: SubmitEventPromise) => {
+    try {
+        const { valid } = await event;
+        if (!valid) return
+        await confirmResetPassword({
+            username: state.value.email,
+            confirmationCode: state.value.code,
+            newPassword: state.value.password,
+        });
+        await navigateTo("/login")
+    } catch (error) {
+        toast("Código OTP Invalido, intente nuevamente!", {
+            "theme": "colored",
+            "type": "error",
+            "position": "top-center",
+            "autoClose": false,
+            "dangerouslyHTMLString": true
+        })
+    }
+
+}
 
 </script>
 <template>
@@ -57,7 +71,7 @@ export default {
             class="bg-white pt-10 lg:pt-0 lg:m-auto lg:w-3/6  flex lg:rounded-lg lg:shadow-lg lg:border lg:border-gray-300">
             <div class="px-5 lg:w-11/12 lg:py-8 mx-auto">
 
-                <v-stepper v-model="step" alt-labels hide-actions flat
+                <v-stepper v-model="state.step" alt-labels hide-actions flat
                     :items="['Email', 'Código de verificación', 'Nueva Contraseña']">
                     <template v-slot:item.1>
                         <h1 class="text-2xl text-violet-950 font-black">¿Olvidaste tu contraseña?</h1>
@@ -65,8 +79,8 @@ export default {
                             diligencialo y
                             restaura tu cuenta.</span>
                         <v-form @submit.prevent="step1" class="pt-4 flex flex-col">
-                            <v-text-field :rules="[() => !!email || 'Campo requerido']" required
-                                prepend-inner-icon="mdi-email" variant="outlined" v-model="email" label="Email"
+                            <v-text-field :rules="[() => !!state.email || 'Campo requerido']" required
+                                prepend-inner-icon="mdi-email" variant="outlined" v-model="state.email" label="Email"
                                 type="email"></v-text-field>
                             <button type="submit"
                                 class="w-full py-4 text-white font-bold bg-gradient-to-r from-fuchsia-900 to-violet-950 rounded-lg">Siguiente</button>
@@ -79,9 +93,9 @@ export default {
                         </span>
                         <v-form @submit.prevent="step2" class="pt-4 flex flex-col">
                             <div class="py-6">
-                                <v-otp-input v-model="code" focus-all :length="6"></v-otp-input>
+                                <v-otp-input v-model="state.code" focus-all :length="6"></v-otp-input>
                             </div>
-                            <button @click="step++" color="surface-variant" text="Submit" variant="tonal"
+                            <button color="surface-variant" text="Submit" variant="tonal"
                                 class="bg-gradient-to-r from-fuchsia-900 to-violet-950 text-white font-bold py-4 w-full rounded-lg">Enviar</button>
                         </v-form>
                     </template>
@@ -92,12 +106,15 @@ export default {
                         </span>
                         <v-form @submit.prevent="step3">
                             <div class="py-4">
-                                <v-text-field :rules="[() => !!password || 'Campo requerido']" required
-                                    prepend-inner-icon="mdi-lock" variant="outlined" v-model="password" label="Contraseña"
+                                <v-text-field
+                                    :rules="[() => state.password.length > 5 || 'Longitud mínima 6 caracteres']"
+                                    required prepend-inner-icon="mdi-lock" variant="outlined" v-model="state.password"
+                                    label="Contraseña" type="password"></v-text-field>
+                                <v-text-field
+                                    :rules="[() => state.password == state.confirmPassword || 'Contraseña no coincide']"
+                                    required prepend-inner-icon="mdi-lock" variant="outlined"
+                                    v-model="state.confirmPassword" label="Confirma Contraseña"
                                     type="password"></v-text-field>
-                                <v-text-field :rules="[() => password == confirmPassword || 'Contraseña no coincide']"
-                                    required prepend-inner-icon="mdi-lock" variant="outlined" v-model="confirmPassword"
-                                    label="Confirma Contraseña" type="password"></v-text-field>
                             </div>
                             <button type="submit" color="surface-variant" text="Submit" variant="tonal"
                                 class="bg-gradient-to-r from-fuchsia-900 to-violet-950 text-white font-bold py-4 w-full rounded-lg">Enviar</button>

@@ -6,11 +6,6 @@ import outputs from '../../amplify_outputs.json';
 
 Amplify.configure(outputs);
 
-
-
-
-// console.log(route.query)
-
 export default {
   // Properties returned from data() become reactive state
   // and will be exposed on `this`.
@@ -32,17 +27,6 @@ export default {
 
     }
   },
-  watch: {
-    async code(code) {
-      // if (code?.length == 6) {
-      //   this.loading = true;
-      //   const a = await confirmSignIn({
-      //     challengeResponse: this.code
-      //   })
-      //   console.log(a)
-      // }
-    }
-  }
 }
 
 </script>

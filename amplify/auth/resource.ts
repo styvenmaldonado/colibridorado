@@ -46,6 +46,18 @@ export const auth = defineAuth({
       maxLen: 80,
       minLen: 1,
     },
+    "custom:city": {
+      dataType: "String",
+      mutable: true,
+      maxLen: 80,
+      minLen: 1,
+    },
+    "custom:country": {
+      dataType: "String",
+      mutable: true,
+      maxLen: 80,
+      minLen: 1,
+    },
   },
   groups: ["SUPERADMIN", "ADMIN"],
 });

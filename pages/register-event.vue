@@ -61,6 +61,29 @@ export default {
       } catch (error) {
         console.log(error)
       }
+    },
+    async next() {
+
+
+      const res: any = await $fetch('https://sandbox.wompi.co/v1/payment_links', {
+        method: 'POST',
+        headers: {
+          'Authorization': "Bearer prv_test_5c3HXUENPsGMxTOjmrotKwaHFu4Drf3S"
+        },
+        body: {
+          "name": "Ceremonia - Evento 1", // Nombre del link de pago
+          "description": "Ceremonia evento 1", // Descripción del pago
+          "single_use": false, // `false` current caso de que el link de pago pueda recibir múltiples transacciones APROBADAS o `true` si debe dejar de aceptar transacciones después del primer pago APROBADO
+          "collect_shipping": false, // Si deseas que el cliente inserte su información de envío current el checkout, o no
+          "redirect_url": "http://localhost:3000/payment-state", // URL donde será redirigido el cliente una vez termine el proceso de pago
+          "currency": "COP",  //Únicamente está disponible pesos colombianos (COP) current el momento. En el futuro soportaremos mas monedas
+          "amount_in_cents": 6000000 // Si el pago current por un monto especifico, si no lo incluyes el pagador podrá elegir el valor a pagar
+        }
+      })
+
+
+      window.location.href = `https://checkout.wompi.co/l/${res?.data?.id || "00000"}`
+
     }
   }
 }
@@ -85,9 +108,13 @@ export default {
         <v-stepper alt-labels v-model="step" :items="items" hide-actions flat>
           <template v-slot:item.1>
             <v-form z @submit.prevent="step++" class="pt-4 flex flex-col">
-              <p class="font-bold">¿Has sido referido/a por alguien?¿Quién? Esa persona es tu terapeuta?</p>
-              <v-text-field :rules="[() => !!address || 'Campo requerido']" required variant="outlined"
-                v-model="address" label=""></v-text-field>
+              <p class="font-bold">Rol</p>
+              <v-select variant="outlined" :items="['Caminantes No Entrenad@s',
+                'Caminantes Entrenad@s',
+                'Caminantes Entrenamiento Especial',
+                'Caminantes Administrativo',
+                'Caminantes Logistica',
+                'Caminantes Acostad@s']" label="Rol"></v-select>
               <p class="font-bold">¿Has sido referido/a por alguien?¿Quién? Esa persona es tu terapeuta?</p>
               <v-text-field :rules="[() => !!address || 'Campo requerido']" required variant="outlined"
                 v-model="address" label=""></v-text-field>
@@ -107,15 +134,14 @@ export default {
           <template v-slot:item.2>
             <v-form @submit.prevent="onSubmit" class="pt-4 flex flex-col">
               <p class="font-bold">¿Necesita transporte? </p>
-              <v-select  :items="['Si', 'No']" variant="outlined"></v-select>
+              <v-select :items="['Si', 'No']" variant="outlined"></v-select>
               <p class="font-bold">¿Tienes disponibilidad de Cupos de Transporte? </p>
-              <v-select  :items="['Si', 'No']" variant="outlined"></v-select>
+              <v-select :items="['Si', 'No']" variant="outlined"></v-select>
               <p class="font-bold">Asientos disponibles</p>
               <v-text-field :rules="[() => !!address || 'Campo requerido']" required variant="outlined"
                 v-model="address" label=""></v-text-field>
-             
-              <button type="submit" 
-                @click="step++"
+
+              <button type="submit" @click="step++"
                 class="w-full py-4 text-white font-bold bg-gradient-to-r from-fuchsia-900 to-violet-950 rounded-lg">Siguiente</button>
             </v-form>
           </template>
@@ -142,9 +168,10 @@ export default {
                 </div>
                 <p>Termina de Pagar. Lleva el saldo del valor de la Ceremonia en efectivo.</p>
               </div>
-             
-              <button type="submit" 
-                class="w-full py-4 text-white font-bold bg-gradient-to-r from-fuchsia-900 to-violet-950 rounded-lg">Realizar Pago</button>
+
+              <button type="submit" @click="next"
+                class="w-full py-4 text-white font-bold bg-gradient-to-r from-fuchsia-900 to-violet-950 rounded-lg">Realizar
+                Pago</button>
             </v-form>
           </template>
         </v-stepper>

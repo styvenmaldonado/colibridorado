@@ -11,8 +11,16 @@ import { client } from '~/libs/AmplifyDataClient';
 import { v4 as uuidv4 } from 'uuid';
 import type { SubmitEventPromise } from 'vuetify';
 
+const route = useRoute();
 
-const { data: usersTypes, status } = await useAsyncData('usersTypes', async () => {
+const { data: user, status } = await useAsyncData('getUser', async () => {
+  const { data } = await client.models.Users.get({id: route.query.id?.toString() || ""})
+  return data
+})
+
+
+
+const { data: usersTypes } = await useAsyncData('usersTypes', async () => {
   const { data } = await client.models.UsersTypes.list()
   return data
 })
@@ -29,19 +37,19 @@ const t_doc = [
 
 const data = ref({
   userTypesList: usersTypes.value?.map(c => c.name),
-  givenName: "",
-  familyName: "",
-  tipo_documento: "",
-  numero_documento: "",
-  birthdate: "",
-  address: "",
-  email: "",
-  phone: "",
+  givenName: user.value?.given_name,
+  familyName:user.value?.family_name,
+  tipo_documento: user.value?.tipo_documento,
+  numero_documento: user.value?.numero_documento,
+  birthdate: user.value?.birthdate,
+  address: user.value?.address,
+  email: user.value?.email,
+  phone: user.value?.phone_number,
   password: "",
   confirmPassword: "",
-  city: "",
-  country: "",
-  rol: "",
+  city: user.value?.city,
+  country: user.value?.country,
+  rol: user.value?.rol,
   userType: []
 })
 
@@ -50,7 +58,7 @@ const submit = async (event: SubmitEventPromise) => {
   const { valid } = await event;
   if (!valid) return
   const id = uuidv4()
-  const { errors } = await client.models.Users.create({
+  const { errors } = await client.models.Users.update({
     id: id,
     userId: id,
     phone_number: data.value.phone, // E.164 number convention
@@ -66,14 +74,16 @@ const submit = async (event: SubmitEventPromise) => {
     rol: data.value.rol
   })
   if (!errors) {
-    toast("Usuario Creado con Exito!", {
+    toast("Usuario Actualizado con Exito!", {
       "theme": "colored",
       "type": "success",
       "dangerouslyHTMLString": true
     })
-    await navigateTo({
-      path: "/users"
+    setTimeout(async ()=>{
+      await navigateTo({
+      path: "/users/detail/"+ route.query.id?.toString()
     })
+    },3000)
   } else {
     toast("Error, Intenta Nuevamente!", {
       "theme": "colored",
@@ -93,7 +103,7 @@ const submit = async (event: SubmitEventPromise) => {
       <div class="flex items-center pt-8 ">
         <div class="flex flex-col gap-3">
           <button @click="navigateTo('/users')" class="w-12"><v-icon size="large">mdi-arrow-left</v-icon></button>
-          <h1 class="text-4xl font-bold">Nuevo Usuario</h1>
+          <h1 class="text-4xl font-bold">Editar Usuario</h1>
         </div>
       </div>
       <div class="py-8">

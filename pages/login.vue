@@ -1,47 +1,29 @@
-<script lang="ts">
-import { signIn } from 'aws-amplify/auth';
-import { Amplify } from "aws-amplify";
-import outputs from '../amplify_outputs.json';
-import { toast } from "vue3-toastify";
+<script setup lang="ts">
+definePageMeta({ middleware: "guest-only", auth: { authenticatedRedirectTo: "/" } })
+
+import { ref } from 'vue'
 import "vue3-toastify/dist/index.css";
-
-
-Amplify.configure(outputs);
-
-export default {
-  // Properties returned from data() become reactive state
-  // and will be exposed on `this`.
-  data() {
-    return {
-      email: "",
-      password: ""
-    }
-  },
-  methods: {
-    async onSubmit() {
-      try {
-        const { nextStep } = await signIn({
-          username: this.email,
-          password: this.password
-        })
-
-        nextStep.signInStep == "DONE" && await navigateTo("/")
-        nextStep.signInStep == "CONFIRM_SIGN_UP" && await navigateTo({ path: "/OTP", query: { email: this.email } })
-
-      } catch (e) {
-        toast("Usuario y Contraseña Invalidos", {
-          "theme": "colored",
-          "type": "error",
-          "position": "bottom-center",
-          "autoClose": false
-        })
-
-      }
-
-    }
+const { signIn } = useAuth()
+const credentials = ref({
+  username: "",
+  password: ""
+})
+const state = ref("")
+const show1 = ref(false)
+const onSubmit = async () => {
+  try {
+    await signIn('credentials', {
+      username: credentials.value.username,
+      password: credentials.value.password,
+      redirect: false,
+    })
+    
+  } catch (error) {
+    console.log(error)
+    state.value = "error"
+    credentials.value.password = ""
   }
 }
-
 </script>
 
 <template>
@@ -60,12 +42,18 @@ export default {
         <h1 class="text-2xl text-violet-950 font-black">Iniciar Sesion</h1>
         <span>Bienllegad@ a la Familia Colibrí Dorado, un espacio de sanación desde la frecuencia cuántica del amor.
         </span>
-        <v-form @submit.prevent="onSubmit" class="pt-4 flex flex-col">
-          <v-text-field :rules="[() => !!email || 'Campo requerido']" required prepend-inner-icon="mdi-email"
-            variant="outlined" v-model="email" label="Email" type="email"></v-text-field>
-          <v-text-field :rules="[() => !!password || 'Campo requerido']" required persistent-hint type="password"
-            prepend-inner-icon="mdi-lock-outline" variant="outlined" v-model="password"
+        <v-form @submit.prevent="onSubmit" class="pt-4 flex flex-col gap-y-2">
+          <v-text-field :rules="[() => !!credentials.username || 'Campo requerido']" required
+            prepend-inner-icon="mdi-email" variant="outlined" v-model="credentials.username" label="Email"
+            type="email"></v-text-field>
+          <v-text-field :rules="[() => !!credentials.password || 'Campo requerido']" required persistent-hint
+            :append-inner-icon="show1 ? 'mdi-eye' : 'mdi-eye-off'"  @click:append-inner="show1 = !show1"  :type="show1 ? 'text' : 'password'"
+            prepend-inner-icon="mdi-lock-outline" variant="outlined" v-model="credentials.password"
             label="Contraseña"></v-text-field>
+          <div v-if="state == 'error'" class="text-red-600 flex gap-2 p-4 bg-red-50 rounded-lg border-2 border-red-700 ">
+            <div><v-icon>mdi-alert-circle</v-icon></div>
+            <span>Usuario y/o contraseña invalidos</span>
+          </div>
           <div class="flex mb-6">
             <NuxtLink to="/forgot-password" class="text-fuchsia-900 ml-auto font-bold">¿Olvidaste tu contraseña?
             </NuxtLink>
