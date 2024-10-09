@@ -30,11 +30,6 @@ export default {
           icon: "mdi-credit-card-outline",
           route: "/payments",
         },
-        {
-          name: "Configuración",
-          icon: "mdi mdi-cog",
-          route: "/settings",
-        },
       ],
     }
   },

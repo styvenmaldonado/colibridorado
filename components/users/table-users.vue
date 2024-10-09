@@ -40,7 +40,7 @@ export default {
     },
     { title: 'Tipo Documento', key: 'tipo_documento', align: 'end' },
     { title: 'Numero Documento', key: 'numero_documento', align: 'end' },
-    { title: 'Telefono', key: 'phone', align: 'end' },
+    { title: 'Telefono', key: 'phone_number', align: 'end' },
     { title: 'Email', key: 'email', align: 'end' },
   ]" loading-text="Cargando... Por favor espere!" :items="serverItems" :items-length="totalItems" :loading="loading"
     item-value="name" @update:options="loadItems" @click:row="handleClick"></v-data-table-server>

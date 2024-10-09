@@ -11,6 +11,7 @@ export default {
 
   data() {
     return {
+      step: 1,
       t_doc: [
         'CC - Cédula de Ciudadanía',
         'CE - Cédula de extranjería',

@@ -115,12 +115,12 @@ const deleteUser = async () => {
                                 <span>{{ data?.birthdate }}</span>
                             </div>
                             <div class="grid">
-                                <span class="font-bold">Tipo de Usuario</span>
-                                <span>{{ data?.country }}</span>
+                                <span class="font-bold">rol</span>
+                                <span>ADMIN</span>
                             </div>
-                            <div class="grid">
+                            <div v-if="data?.rol" class="grid">
                                 <span class="font-bold">Tipo de Usuario</span>
-                                <span>{{ data?.country }}</span>
+                                <span>{{ data?.rol }}</span>
                             </div>
                         </div>
                     </div>

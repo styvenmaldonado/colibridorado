@@ -5,6 +5,6 @@ import Sidebar from '~/layouts/Sidebar.vue';
 <template>
     <div class="h-screen w-screen flex">
         <Sidebar/>
-        <div class="w-full h-full"></div>
+        <payments/>
     </div>
 </template>

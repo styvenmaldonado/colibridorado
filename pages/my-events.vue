@@ -1,8 +1,18 @@
 <script setup lang="ts">
-definePageMeta({ middleware: "auth", auth: { guestRedirectTo: "/login" } })
+//definePageMeta({ middleware: "auth", auth: { guestRedirectTo: "/login" } })
 import ButtonNavigation from '~/layouts/ButtonNavigation.vue';
-const { signIn, signOut, session, status, cookies, getProviders } = useAuth()
+import { client } from '~/libs/AmplifyDataClient';
+import { format } from "date-fns";
 
+const { user } = useAuth()
+
+const { data: events, status,error } = await useAsyncData(
+  "my-events",
+  async () => {
+    const { data } = await client.models.Events.list()
+    return data;
+  }
+);
 </script>
 <template>
   <div class="flex flex-col w-screen h-screen">
@@ -28,40 +38,19 @@ const { signIn, signOut, session, status, cookies, getProviders } = useAuth()
         </div>
       </div>
    
-      <div class="px-5 py-6 flex flex-col">
-        <a href="/event/123" class="card py-4 w-full">
+      <div v-for="(event,index) in events" :key="index" class="px-5 py-6 flex flex-col">
+        <a   :href="'/event/' + event.id" class="card py-4 w-full">
           <div class="h-60 w-full">
             <img class="w-full h-full rounded-lg object-fit"
-              src="https://images.pexels.com/photos/1025469/pexels-photo-1025469.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1" />
+              :src="'https://d334a63s5wk7yh.cloudfront.net/'+ event?.photos![0]"/>
           </div>
           <div class="grid pt-2">
-            <span class="font-bold">Colibri Dorado</span>
-            <span>Sábado, 31 de Agosto de 2024 4:00 pm (GMT-5)</span>
-            <span>Rosal, Cundinamarca, Colombia</span>
+            <span class="font-bold">{{ event.name }}</span>
+            <span>{{ format(new Date(event?.datetime_start || ""),"d 'de' MMMM yyyy - hh:mm aaaa") }}</span>
+            <span>{{ event.location }}</span>
           </div>
         </a>
-        <a href="/event/123" class="card py-4 w-full flex-shrink-0">
-          <div class="h-60 w-full">
-            <img class="w-full h-full rounded-lg object-fit"
-              src="https://images.pexels.com/photos/1025469/pexels-photo-1025469.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1" />
-          </div>
-          <div class="grid pt-2">
-            <span class="font-bold">Colibri Dorado</span>
-            <span>Sábado, 31 de Agosto de 2024 4:00 pm (GMT-5)</span>
-            <span>Rosal, Cundinamarca, Colombia</span>
-          </div>
-        </a>
-        <a href="/event/123" class="card py-4 w-full">
-          <div class="h-60 w-full">
-            <img class="w-full h-full rounded-lg object-fit"
-              src="https://images.pexels.com/photos/1025469/pexels-photo-1025469.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1" />
-          </div>
-          <div class="grid pt-2">
-            <span class="font-bold">Colibri Dorado</span>
-            <span>Sábado, 31 de Agosto de 2024 4:00 pm (GMT-5)</span>
-            <span>Rosal, Cundinamarca, Colombia</span>
-          </div>
-        </a>
+      
       </div>
       <div class="pt-24"></div>
     </div>

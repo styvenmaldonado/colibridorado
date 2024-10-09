@@ -1,17 +1,5 @@
 <script setup lang="ts">
 const route = useRoute();
-
-const { data, status, error, refresh, clear } = await useAsyncData(
-  'mountains',
-  async () => {
-    const res: any = await $fetch('https://sandbox.wompi.co/v1/transactions/' + route.query.id)
-    return res
-  }
-)
-
-
-console.log(data)
-
 </script>
 <template>
   <div class="flex flex-col w-screen h-screen">

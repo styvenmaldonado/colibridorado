@@ -1,11 +1,13 @@
+import type { CostEventInterface } from "./CostEventInterface"
+
 export interface EventInteface{
     name?: string,
     location?: string
     datetime_start?: string
-    datetime_end?: String
+    datetime_end?: string
     description?: string
     photos: string[]
-    cancelPolicy: string
-    cost?: { id: string; userType: any; usd: number; cop: number; mxn: number; }[] | undefined
-    type: string
+    cancelPolicy?: string
+    cost: CostEventInterface[] | undefined
+    type?: string
   }

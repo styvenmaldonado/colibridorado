@@ -1,36 +1,22 @@
 <script lang="ts">
+import { client } from '~/libs/AmplifyDataClient';
+
 export default {
   data: () => ({
     itemsPerPage: 5,
-    serverItems: [
-      {
-        name: 'Ceremonia de Colibri Dorado',
-        type: 'Ceremonia',
-        location: 'Rosal - Cundinamarca',
-        datetime_start: '30 de Agosto de 2024'
-      },
-      {
-        name: 'Retiro de Colibri Dorado',
-        type: 'Retiro',
-        location: 'Rosal - Cundinamarca',
-        datetime_start: '30 de Agosto de 2024'
-      },
-      {
-        name: 'Retiro de Colibri Dorado 2',
-        type: 'Ceremonia',
-        location: 'Rosal - Cundinamarca',
-        datetime_start: '30 de Agosto de 2024'
-      },
-    ],
+    serverItems: [],
     loading: false,
     totalItems: 0,
   }),
   methods: {
-    loadItems() {
-
+    async loadItems() {
+      const { data } = await client.models.Events.list()
+      // @ts-ignore
+      this.serverItems = data
     },
-    async handleClick(_row: any) {
-      await navigateTo("/events/detail/12345" )
+    async handleClick(e: PointerEvent, row: any) {
+      const { id } = this.serverItems[row?.index || 0]
+      await navigateTo(`/events/detail/${id}`)
     }
   },
 }

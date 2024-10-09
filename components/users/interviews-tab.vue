@@ -1,11 +1,7 @@
-<script lang="ts">
-export default {
-    methods: {
-    async goTo(route:string){
-      await navigateTo({ path: route})
-    }
-  }
-}
+<script setup lang="ts">
+const route = useRoute()
+
+
 </script>
 <template>
     <div class="pb-4">
@@ -14,7 +10,7 @@ export default {
                 <h1 class="text-4xl font-bold">Entrevistas</h1>
             </div>
             <div class="ml-auto">
-                <button @click="goTo('/users/createInterview')"
+                <button @click="navigateTo('/users/createInterview/'+ route.params?.id)"
                     class="px-5 font-bold rounded-lg py-3 bg-gradient-to-r from-fuchsia-900 to-violet-950 text-white">+
                     Nueva Entrevista</button>
             </div>

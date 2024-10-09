@@ -20,9 +20,8 @@ const schema = a.schema({
       tipo_documento: a.string(),
       city: a.string(),
       country: a.string(),
-      userTypeId: a.string(),
+      userTypeId: a.json(),
       rol: a.string(),
-      usersTypes: a.belongsTo("UsersTypes","userTypeId"),
       eventsUsers: a.hasMany("EventsUser","userId"),
       interviews: a.hasMany("Interviews","userId"),
       payment: a.hasMany("Payments","userId")
@@ -34,7 +33,6 @@ const schema = a.schema({
       userTypeId: a.id().required(),
       name: a.string(),
       description: a.string(),
-      users: a.hasMany("Users","userTypeId")
     })
     .authorization((allow) => [allow.guest()]),
 
@@ -55,12 +53,12 @@ const schema = a.schema({
       name: a.string(),
       location: a.string(),
       datetime_start: a.datetime(),
-      datetime_end: a.date(),
+      datetime_end: a.datetime(),
       description: a.string(),
       photos: a.string().array(),
       cancelPolicy: a.string(),
       cost: a.json(),
-
+      eventsId: a.hasMany("EventsUser","eventId")
     })
     .authorization((allow) => [allow.guest()]),
 
@@ -71,10 +69,14 @@ const schema = a.schema({
       suggestions: a.string(),
       aditional_info: a.string(),
       transport_description: a.string(),
+      available_seats_number: a.integer(),
       available_seats: a.boolean(),
-      needs_transport: a.string(),
+      needs_transport: a.boolean(),
       userId: a.string(),
+      eventId: a.string(),
+      rol: a.json(),
       users: a.belongsTo("Users","userId"),
+      events: a.belongsTo("Events","eventId"),
       payments: a.hasMany("Payments","eventUsersId")
 
     })
@@ -84,7 +86,10 @@ const schema = a.schema({
     .model({
       paymentId: a.id().required(),
       status: a.string(),
+      method: a.string(),
       datetime:a.datetime(),
+      attachment: a.string(),
+      info: a.json(),
       value: a.float(),
       userId: a.string(),
       eventUsersId: a.string(),

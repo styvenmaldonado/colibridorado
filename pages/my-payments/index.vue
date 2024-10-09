@@ -1,5 +1,5 @@
 <script setup lang="ts">
-definePageMeta({ middleware: "auth", auth: { guestRedirectTo: "/login" } })
+//definePageMeta({ middleware: "auth", auth: { guestRedirectTo: "/login" } })
 import ButtonNavigation from '~/layouts/ButtonNavigation.vue';
 const { signIn, signOut, session, status, cookies, getProviders } = useAuth()
 
@@ -28,7 +28,7 @@ const { signIn, signOut, session, status, cookies, getProviders } = useAuth()
       </div>
       
       <div class="py-4 flex flex-col gap-5 px-5">
-        <button type="submit"
+        <button @click="navigateTo('/my-payments/form')" type="submit"
                 class="w-full py-4 text-white font-bold bg-gradient-to-r from-fuchsia-900 to-violet-950 rounded-lg">+ Subir Comprobante</button>
         <div class="p-5 rounded-lg border border-gray-400 flex flex-col">
           <v-icon size="x-large">mdi-credit-card-outline</v-icon>
