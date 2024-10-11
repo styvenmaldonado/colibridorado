@@ -10,7 +10,10 @@ import type { EventInteface } from "~/inteface/EventInterface";
 //Amplify
 import { Amplify } from "aws-amplify";
 import outputs from "../../amplify_outputs.json";
+
 import { toast } from "vue3-toastify";
+import 'vue3-toastify/dist/index.css';
+
 Amplify.configure(outputs);
 
 const { data: usersTypes, status } = await useAsyncData(

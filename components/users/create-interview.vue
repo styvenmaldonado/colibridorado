@@ -4,6 +4,8 @@ import outputs from "../../amplify_outputs.json";
 import { signUp } from "aws-amplify/auth";
 import { client } from "~/libs/AmplifyDataClient";
 import { toast } from "vue3-toastify";
+import 'vue3-toastify/dist/index.css';
+
 
 Amplify.configure(outputs);
 const route = useRoute();
